@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Float four columns side by side */
+.column {
+  float: left;
+  width: 25%;
+  padding: 0 10px;
+}
+
+/* Remove extra left and right margins, due to padding */
+.row {margin: 0 -5px;}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive columns */
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+/* Style the counter cards */
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  text-align: center;
+  background-color: #f1f1f1;
+}
+</style>
+</head>
+<body style="background-color:mistyrose">
+
+<center><h2>Reports</h2></center>
+
+
+<div class="row" style="padding-top: 40px;">
+    <div class="column">
+        <a href="/mentorpdf"><div class="card" style="background-color:pink">
+          <h3>Mentor Details</h3>
+          <p>click here</p>
+        </div></a>
+    </div>
+
+    <div class="column">
+        <a href="/meetingpdf"><div class="card" style="background-color:palegreen">
+          <h3>Doctorial Meeting Details</h3>
+          <p>click here</p>
+          
+        </div></a>
+      </div>
+  
+      <div class="column">
+        <a href="/thesispdf"><div class="card" style="background-color:silver">
+          <h3>Thesis Submission Details</h3>
+          <p>click here</p>
+          
+        </div></a>
+      </div>
+  
+      <div class="column">
+        <a href="/vivapdf"><div class="card" style="background-color:yellow">
+          <h3>Viva status details</h3>
+          <p>click here</p>
+          
+        </div></a>
+      </div>
+</div>
+
+<div class="row" style="padding-top: 40px;">
+    <div class="column">
+        <a href="/coursepdf"><div class="card" style="background-color:orange">
+          <h3>Course Details</h3>
+          <p>click here</p>
+          
+        </div></a>
+      </div>
+
+  <div class="column">
+    <a href="/locpdf"><div class="card" style="background-color:tan">
+      <h3>Center Location Details</h3>
+      <p>click here</p>
+      
+    </div></a>
+  </div>
+  
+  <div class="column">
+    <a href="/centerpdf"><div class="card" style="background-color: tomato;">
+      <h3>Center Details</h3>
+      <p>click here</p>
+      
+    </div></a>
+  </div>
+  
+  
+</div>
+
+</body>
+</html>
