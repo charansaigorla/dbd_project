@@ -32,37 +32,40 @@
                         <li class="nav-item" style="padding-top: 20px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;" onclick="fun()">Mentor Details</button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/thesisform">Give thesis Details</a></button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/vivaform">Give Viva Details</a></button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/courseform">Give Course Details</a></button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/adminform">Give Admission Details</a></button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/mentorform">Give Mentor Details</a></button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/reportstd">Reports</a></button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
-                          <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;">Thesis status</button>
-                        </li>
-                        <li class="nav-item" style="padding-top: 40px;">
-                          <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;">Viva status</button>
-                        </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;" onclick="fun1()">Course details</button>
                         </li>
                         <li class="nav-item" style="padding-top: 40px;">
+                          <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/studentform">Give Student Details</a></button>
+                        </li>
+                        <li class="nav-item" style="padding-top: 30px;">
+                          <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;">Viva status</button>
+                        </li>
+                        <li class="nav-item" style="padding-top: 30px;">
+                          <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;" onclick="fun1()">Course details</button>
+                        </li>
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;">Admission details</button>
                         </li>
-                        <li class="nav-item" style="padding-top: 40px;">
+                        <li class="nav-item" style="padding-top: 30px;">
                           <button type="button" class="btn btn-warning btn-block container-sm" style="size: 30px;"><a href="/thesisform">Give Thesis Details</a></button>
                         </li>
                         <li class="nav-item" style="padding-top: 40px;">
@@ -137,12 +140,14 @@
         <thead>
           <tr class="table-warning">
             <th scope="col">Mentor Id</th>
-            <th scope="col">Mentor First Name</th>
+            <th scope="col">Student ID</th>
       
+            <th scope="col">Student First Name</th>
+            <th scope="col">Mentor First Name</th>
             <th scope="col">Mentor Last Name</th>
-            <th scope="col">Phone Number</th>
-            <th scope="col">Age</th>
         
+            <th scope="col">Mentor Phone Number</th>
+            <th scope="col">Mentor Age</th>
             <th scope="col">Mentor Email</th>
   
             
@@ -154,13 +159,15 @@
             
           {% for i in post1 %}
             <tr>
-              <th scope="row">{{i.mid}}</th>
+              <th scope="row">{{i.mentor_id}}</th>
               <!-- <td>{{i.sid}}</td> -->
-              <td>{{i.mfn}}</td>
-              <td>{{i.mln}}</td>
-              <td>{{i.m_phno}}</td>
-              <td>{{i.m_age}}</td>
-              <td>{{i.m_email}}</td>
+              <td>{{i.student_id}}</td>
+              <td>{{i.student_first_name}}</td>
+              <td>{{i.mentor_first_name}}</td>
+              <td>{{i.mentor_last_name}}</td>
+              <td>{{i.mentor_phno}}</td>
+              <td>{{i.mentor_age}}</td>
+              <td>{{i.mentor_email}}</td>
               
             </tr>
           {% endfor %}
@@ -178,11 +185,13 @@
         <thead>
           <tr class="table-warning">
             <th scope="col">Course id</th>
+            <th scope="col">Student id</th>
+            <th scope="col">Student First Name</th>
             <th scope="col">Course Instructor First Name</th>
       
             <th scope="col">Course Instructor Last Name</th>
             <th scope="col">Course name</th>
-            <th scope="col">Taken by(Student ID)</th>
+      
         
             
   
@@ -196,11 +205,13 @@
           {% for i in post2 %}
             <tr>
               <th scope="row">{{i.course_id}}</th>
-              <!-- <td>{{i.sid}}</td> -->
-              <td>{{i.c_inst_fn}}</td>
-              <td>{{i.c_inst_ln}}</td>
+              <td>{{i.student_id}}</td>
+              <td>{{i.student_first_name}}</td>
+          
+              <td>{{i.instructor_first_name}}</td>
+              <td>{{i.instructor_last_name}}</td>
               <td>{{i.course_name}}</td>
-              <td>{{i.sid}}</td>
+              
             
               
             </tr>

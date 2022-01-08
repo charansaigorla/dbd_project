@@ -2,19 +2,25 @@ from contextlib import redirect_stderr
 from django.shortcuts import render,redirect
 from django.contrib.auth import login as auth_login,authenticate ,logout
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 #from .models import tbl_Authentication
 from django.contrib import messages
 from django.http import FileResponse
 from django.http import HttpResponseRedirect
+from .forms import CreateUserForm
+from django.contrib import messages
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
-from .models import Student,courses,Mentor,meetings, stuform,meetform,thesisform,vivaform
+from .models import Student, centerloc,courses,Mentor,meetings, mentorform, stuform,meetform,thesisform,vivaform
 from .forms import adminForm, centerForm, courseForm, locForm, mentorForm, studForm,meetForm,thesisForm,vivaForm,courseform,adminform,centerform
 from fpdf import FPDF
 from firstproject import settings
 from django.core.mail import send_mail
+from django.db import connection
+
+#from demo.firstproject.demoapp import forms
 # Create your views here.
 
    
@@ -25,14 +31,12 @@ def repo(request):
 def repos(request):
     return render(request,'reportstud.html')
 def student(request):
-    post = Student.objects.all()
-    post1 = Mentor.objects.all()
-    post2 = courses.objects.all()
-    print(post1)
-    return render(request,"student.html",{"post":post,"post1":post1,"post2":post2})
+    post1 = mentorform.objects.all()
+    post2 = courseform.objects.all()
+    return render(request,"student.html",{"post1":post1,"post2":post2})
 def mentor(request):
     post = stuform.objects.all()
-    post3 = meetings.objects.all()
+    post3 = meetform.objects.all()
     return render(request,'mentor.html',{"post":post,"post3":post3})
 
 
@@ -93,6 +97,21 @@ def lgout(request):
     logout(request)
     messages.success(request,"Logged out Successfully")
     return redirect(home)
+def regis(request):
+#    if request.user.is_authenticated:
+#        return redirect(login)
+#    else: 
+        form = CreateUserForm()
+        if request.method == 'POST':
+            form = CreateUserForm(request.POST)
+            if form.is_valid():
+                form.save()
+                user = form.cleaned_data.get('username')
+                messages.success(request,'Account created for '+user)
+                return redirect(login)
+
+        context={'form':form}
+        return render(request,'registerform.html',context)
 def student_pdf(request):
     buf=io.BytesIO()
     c=canvas.Canvas(buf, pagesize=letter, bottomup=0)
@@ -156,78 +175,202 @@ def student_pdf(request):
 
 
 # Create your views here.
+# def add_stud(request):
+# 	form = studForm(request.POST or None)
+# 	if form.is_valid():
+# 		form.save()
+# 	context = {
+# 		"form": form,
+# 		"title": "New Student",
+# 	}
+# 	return render(request, "studentform.html", context)
 def add_stud(request):
-	form = studForm(request.POST or None)
-	if form.is_valid():
-		form.save()
-	context = {
+    if request.method == 'POST':
+       form = studForm(request.POST or None)
+       if form.is_valid():
+        form.save()
+        phoneno = form.cleaned_data.get('phone_number') 
+        age = form.cleaned_data.get('age') 
+        centorno = form.cleaned_data.get('centor_no') 
+        meetid = form.cleaned_data.get('meeting_id') 
+        if len(phoneno)!= 10:
+            messages.error(request,'Enter valid phone number')
+            connection.cursor().execute("DELETE FROM demoapp_stuform WHERE phone_number = %s",[phoneno])
+            return render(request, "studentform.html", {"form":form})
+        elif(age<15):
+            messages.error(request,'Invalid Age')
+            connection.cursor().execute("DELETE FROM demoapp_stuform WHERE age = %s",[age])
+            return render(request, "studentform.html", {"form":form})
+        elif(centorno<10000):
+            messages.error(request,'Invalid center number')
+            connection.cursor().execute("DELETE FROM demoapp_stuform WHERE center_no = %s",[centorno])
+            return render(request, "studentform.html", {"form":form})
+        elif(meetid<100):
+            messages.error(request,'Invalid meet id')
+            connection.cursor().execute("DELETE FROM demoapp_stuform WHERE meeting_id = %s",[meetid])
+            return render(request, "studentform.html", {"form":form})
+        else:
+            return render(request,"student.html")
+    else:
+       form = studForm()
+       context = {
 		"form": form,
-		"title": "New Student",
-	}
-	return render(request, "studentform.html", context)
+		"title": "New Meeting",
+	  }
+
+    return render(request, "studentform.html", context)
+
 def add_thesis(request):
-	form = thesisForm(request.POST or None)
-	if form.is_valid():
-		form.save()
-	context = {
-		"form": form,
-		"title": "New Record",
-	}
-	return render(request, "thesisform.html", context)
+    if request.method == 'POST':
+      form = thesisForm(request.POST or None)
+      if form.is_valid():
+        form.save()
+        return render(request,"student.html")
+    else:
+        form = thesisForm()
+        context = {
+		  "form": form,
+		"title": "New Meeting",
+	    }
+    return render(request, "thesisform.html", context)
 def add_viva(request):
-	form = vivaForm(request.POST or None)
-	if form.is_valid():
-		form.save()
-	context = {
-		"form": form,
-		"title": "New Record",
-	}
-	return render(request, "vivaform.html", context)
+    if request.method == 'POST':
+      form = vivaForm(request.POST or None)
+      if form.is_valid():
+        form.save()
+        return render(request,"student.html")
+    else:
+        form = vivaForm()
+        context = {
+		  "form": form,
+		"title": "New Meeting",
+	    }
+    return render(request, "vivaform.html", context)
 def add_course(request):
 	form = courseForm(request.POST or None)
 	if form.is_valid():
 		form.save()
+        
+
 	context = {
 		"form": form,
 		"title": "New Record",
 	}
 	return render(request, "courseform.html", context)
+# def add_course(request):
+#    # if request.method == 'POST':
+#        form = courseForm(request.POST or None)
+#        if form.is_valid():
+#           form.save()
+#           courseid = form.cleaned_data.get('course_id') 
+#           if courseid<=1000:
+#             messages.error(request,'Course ID should be above 1000')
+#             connection.cursor().execute("DELETE FROM demoapp_courseform WHERE course_id = %s",[courseid])
+#             return render(request, "courseform.html", {"form":form})
+#         #   else:
+#         #     return render(request,"student.html") 
+
+#         context = {
+# 		  "form": form,
+# 		  "title": "New Meeting",
+# 	    }
+
+#        return render(request, "courseform.html", context)
+
 def add_admin(request):
-	form = adminForm(request.POST or None)
-	if form.is_valid():
-		form.save()
-	context = {
-		"form": form,
-		"title": "New Record",
-	}
-	return render(request, "admission.html", context)
+    if request.method == 'POST':
+      form = adminForm(request.POST or None)
+      if form.is_valid():
+        form.save()
+        return render(request,"student.html")
+    else:
+        form = adminForm()
+        context = {
+		  "form": form,
+		"title": "New Meeting",
+	    }
+    return render(request, "admission.html", context)
+# def add_center(request):
+# 	form = centerForm(request.POST or None)
+# 	if form.is_valid():
+# 		form.save()
+# 	context = {
+# 		"form": form,
+# 		"title": "New Record",
+# 	}
+# 	return render(request, "centerform.html", context)
 def add_center(request):
-	form = centerForm(request.POST or None)
-	if form.is_valid():
-		form.save()
-	context = {
-		"form": form,
-		"title": "New Record",
-	}
-	return render(request, "centerform.html", context)
+    if request.method == 'POST':
+       form = centerForm(request.POST or None)
+       if form.is_valid():
+            form.save()
+            centerno = form.cleaned_data.get('center_no')
+            if(centerno<10000):
+                messages.error(request,'Center Number should be above 10000')
+                connection.cursor().execute("DELETE FROM demoapp_centerform WHERE center_no = %s",[centerno])
+                return render(request, "centerform.html", {"form":form})
+            else:
+                return render(request,"student.html") 
+
+    else:
+        form = centerForm()
+        context = {
+		  "form": form,
+		"title": "New Meeting",
+	    }
+
+    return render(request, "centerform.html", context)
+        
+        
+   
+
+# def add_mentor(request):
+# 	form = mentorForm(request.POST or None)
+# 	if form.is_valid():
+# 		form.save()
+        
+# 	context = {
+# 		"form": form,
+# 		"title": "New Record",
+# 	}
+# 	return render(request, "mentorform.html", context)
 def add_mentor(request):
-	form = mentorForm(request.POST or None)
-	if form.is_valid():
-		form.save()
-	context = {
-		"form": form,
-		"title": "New Record",
-	}
-	return render(request, "mentorform.html", context)
+    if request.method == 'POST':
+      form = mentorForm(request.POST or None)
+      if form.is_valid():
+        form.save()
+        mentorphno = form.cleaned_data.get('mentor_phno')
+        if len(mentorphno) != 10 or int(mentorphno)<1:
+            messages.error(request,'Enter valid phone number')
+            connection.cursor().execute("DELETE FROM demoapp_mentorform WHERE mentor_phno = %s",[mentorphno])
+            return render(request, "mentorform.html", {"form":form})
+        else:
+            return render(request,"student.html") 
+
+    else:
+        form = mentorForm()
+        context = {
+		  "form": form,
+		"title": "New Meeting",
+	    }
+
+    return render(request, "mentorform.html", context)
+       
+   
+
 def add_loc(request):
-	form = locForm(request.POST or None)
-	if form.is_valid():
-		form.save()
-	context = {
-		"form": form,
-		"title": "New Record",
-	}
-	return render(request, "locform.html", context)
+    if request.method == 'POST':
+      form = locForm(request.POST or None)
+      if form.is_valid():
+        form.save()
+        return render(request,"mentor.html")
+    else:
+        form = locForm()
+        context = {
+		  "form": form,
+		"title": "New Meeting",
+	    }
+    return render(request, "locform.html", context)
 # def add_meet(request):
 # 	form = meetForm(request.POST or None)
 # 	if form.is_valid():
@@ -238,6 +381,7 @@ def add_loc(request):
 # 	}
 # 	return render(request, "meetform.html", context)
 def add_meet(request):
+   #if request.method == 'POST':
     form = meetForm(request.POST or None)
     if form.is_valid():
         form.save()
@@ -254,10 +398,13 @@ def add_meet(request):
         from_email = settings.EMAIL_HOST_USER
         to_list = [email]
         send_mail(subject,message,from_email,to_list,fail_silently=True)
+       # return render(request,"mentor.html")
+    #else:
+        #form = meetForm()
     context = {
 		"form": form,
 		"title": "New Meeting",
-	}
+	    }
 
     return render(request, "meetform.html", context)
 
@@ -411,7 +558,7 @@ def thesis_report(request):
     pdf = FPDF('L', 'mm', 'A4')
     pdf.add_page()
     pdf.set_font('courier', 'B', 16)
-    pdf.cell(40, 10, 'Details of Doctorial Meetings',0,1)
+    pdf.cell(40, 10, 'Details of thesis',0,1)
     pdf.cell(40, 10, '',0,1)
     pdf.set_font('courier', '', 12)
     pdf.cell(200, 8, f"{'Student_ID'.ljust(10)} {'FirstName'.ljust(10)}  {'Thesis_Submission_Status'.ljust(10)} {'Date_of_Submission'.ljust(35)}", 0, 1)
@@ -507,7 +654,7 @@ def course_report(request):
     pdf = FPDF('L', 'mm', 'A4')
     pdf.add_page()
     pdf.set_font('courier', 'B', 16)
-    pdf.cell(40, 10, 'Details of Viva Status',0,1)
+    pdf.cell(40, 10, 'Details of Course',0,1)
     pdf.cell(40, 10, '',0,1)
     pdf.set_font('courier', '', 12)
     pdf.cell(200, 8, f"{'Course_ID'.ljust(10)} {'Student_ID'.ljust(10)} {'FirstName'.ljust(10)}  {'Instructor_first_name'.ljust(10)} {'Instructor_last_name'.ljust(10)} {'course_name'.ljust(35)}", 0, 1)
@@ -556,7 +703,7 @@ def admin_report(request):
     pdf = FPDF('L', 'mm', 'A4')
     pdf.add_page()
     pdf.set_font('courier', 'B', 16)
-    pdf.cell(40, 10, 'Details of Viva Status',0,1)
+    pdf.cell(40, 10, 'Details of Admission',0,1)
     pdf.cell(40, 10, '',0,1)
     pdf.set_font('courier', '', 12)
     pdf.cell(200, 8, f"{'hall_ticket_no'.ljust(10)} {'Student_ID'.ljust(10)} {'FirstName'.ljust(10)}  {'Document_Status'.ljust(10)} {'admission_Status'.ljust(10)} {'interview_status'.ljust(35)}", 0, 1)
@@ -605,14 +752,14 @@ def center_report(request):
     pdf = FPDF('L', 'mm', 'A4')
     pdf.add_page()
     pdf.set_font('courier', 'B', 16)
-    pdf.cell(40, 10, 'Details of Viva Status',0,1)
+    pdf.cell(40, 10, 'Details of Center',0,1)
     pdf.cell(40, 10, '',0,1)
     pdf.set_font('courier', '', 12)
-    pdf.cell(200, 8, f"{'Center_no'.ljust(10)} {'Student_ID'.ljust(10)} {'FirstName'.ljust(10)}  {'Instructor_first_name'.ljust(10)} {'Instructor_last_name'.ljust(10)}", 0, 1)
+    pdf.cell(200, 8, f"{'Center_no'.ljust(10)} {'Student_ID'.ljust(10)} {'FirstName'.ljust(10)}  {'Incharge_first_name'.ljust(10)} {'Incharge_last_name'.ljust(10)}", 0, 1)
     pdf.line(10, 30, 290, 30)
     pdf.line(10, 38, 290, 38)
     for line in sales:
-        pdf.cell(200, 8, f"{line['center_no'].ljust(10)} {line['student_id'].ljust(10)} {line['student_first_name'].ljust(10)}  {line['instructor_first_name'].ljust(20)} {line['instructor_last_name'].ljust(20)}",0, 1)
+        pdf.cell(200, 8, f"{line['center_no'].ljust(10)} {line['student_id'].ljust(10)} {line['student_first_name'].ljust(10)}  {line['incharge_first_name'].ljust(20)} {line['incharge_last_name'].ljust(20)}",0, 1)
     pdf.output('center_details.pdf', 'F')
     return FileResponse(open('center_details.pdf', 'rb'), as_attachment=True, content_type='application/pdf')
 def mentor_report(request):
@@ -632,7 +779,7 @@ def mentor_report(request):
 
        
     ]
-    st = centerform.objects.all();
+    st = mentorform.objects.all();
     lis = [
         {},{},{},{},{},{},{},
     ]
@@ -659,7 +806,7 @@ def mentor_report(request):
     pdf = FPDF('L', 'mm', 'A4')
     pdf.add_page()
     pdf.set_font('courier', 'B', 16)
-    pdf.cell(40, 10, 'Details of Viva Status',0,1)
+    pdf.cell(40, 10, 'Details of Mentor',0,1)
     pdf.cell(40, 10, '',0,1)
     pdf.set_font('courier', '', 12)
     pdf.cell(200, 8, f"{'Mentor_ID'.ljust(10)} {'Student_ID'.ljust(10)} {'FirstName'.ljust(10)}  {'mentor_first_name'.ljust(10)} {'mentor_last_name'.ljust(10)} {'mentor_phno'.ljust(10)} {'mentor_age'.ljust(10)} {'mentor_email'.ljust(10)}  ", 0, 1)
@@ -684,7 +831,7 @@ def location_report(request):
 
        
     ]
-    st = centerform.objects.all();
+    st = centerloc.objects.all();
     lis = [
         {},{},{},{},{},{},{},
     ]
@@ -708,7 +855,7 @@ def location_report(request):
     pdf = FPDF('L', 'mm', 'A4')
     pdf.add_page()
     pdf.set_font('courier', 'B', 16)
-    pdf.cell(40, 10, 'Details of Viva Status',0,1)
+    pdf.cell(40, 10, 'Details of Center Location',0,1)
     pdf.cell(40, 10, '',0,1)
     pdf.set_font('courier', '', 12)
     pdf.cell(200, 8, f"{'Center_no'.ljust(10)} {'Student_ID'.ljust(10)} {'FirstName'.ljust(10)}  {'City_name'.ljust(10)} {'State'.ljust(10)}", 0, 1)

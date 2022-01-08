@@ -5,7 +5,7 @@ urlpatterns = [
    # path("",views.base,name="base"),
     path("",views.home,name="home"),
     path("login/", views.login),
-    path("register/", views.register),
+    path("register/", views.regis),
     path("student/logout/", views.lgout),
     path("mentor/logout/", views.lgout),
     path("student/", views.student),
@@ -31,6 +31,7 @@ urlpatterns = [
     path("centerform/",views.add_center),
     path("report/",views.repo),
     path("reportstd/",views.repos),
+    
 
 
     

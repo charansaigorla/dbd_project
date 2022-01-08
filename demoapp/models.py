@@ -18,6 +18,9 @@ class Student(models.Model):
     center_no =models.IntegerField()
     def __str__(self):
         return self.FN
+# class register(models.Model):
+#     username = models.CharField(max_length=20)
+#     pass1 = models.
 class Mentor(models.Model):
     mid =models.IntegerField(primary_key=True)
     mfn =models.CharField(max_length=20)
@@ -35,7 +38,7 @@ class mentorform(models.Model):
     mentor_last_name =models.CharField(max_length=20)
     mentor_phno =models.CharField(max_length=13)
     mentor_age =models.IntegerField()
-    mentor_email =models.CharField(max_length=50)
+    mentor_email =models.EmailField(max_length=50)
     def __str__(self):
         return self.mentor_first_name 
 class centerloc(models.Model):
@@ -151,7 +154,7 @@ class stuform(models.Model):
     meeting_id =models.IntegerField()
     center_no =models.IntegerField()
     def __str__(self):
-        return self.sfn
+        return self.student_first_name
 
 
 
